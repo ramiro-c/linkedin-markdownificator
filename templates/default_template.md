@@ -5,15 +5,15 @@
 {% endfor %}
 
 ## Featured
-{% for title, description in zip(featured.title, featured.description) %}
-### {{title[0]}}
-{{description[0]}}
+{% for post in featured.title %}
+{{ post | join('\n') }}
+
 {% endfor %}
 
 ## Experience
 {% for basic, description in zip(experience.basic, experience.description) %}
-### {{basic[0]}} - {{basic[1]}}
-> {{basic[2]}}
+### {{basic[0]}} — {{basic[1]}}
+> *{{basic[2]}}*
 
 {{description[0]}}
 
@@ -23,7 +23,7 @@
 ## Education
 {% for basic, description in zip(education.basic, education.description) %}
 ### {{basic[1]}}
-> {{basic[0]}} - {{basic[2]}}
+> {{basic[0]}} — {{basic[2]}}
 
 {% if len(description) > 1%}
 {{description[0]}}
@@ -34,10 +34,19 @@
 ###### {{description[-1]}}
 {% endfor %}
 
+## Volunteering
+{% for basic, description in zip(volunteering.basic, volunteering.description) %}
+### {{basic[0]}}
+> {{basic[1]}} — {{basic[2]}}
+
+{{description[0]}}
+###### {{basic[3]}}
+{% endfor %}
+
 ## Certifications
 {% for basic, description in zip(certifications.basic, certifications.description) %}
 ### {{basic[0]}}
-> {{basic[1]}} - {{basic[2]}}
+> **{{basic[1]}}** — *{{basic[2]}}*
 
 {{description[0]}}
 {% endfor %}
@@ -50,12 +59,6 @@
 {{description[0]}}
 ###### {{skills[0]}}
 {%endfor%}
-
-## Courses
-{% for name, associated in zip(courses.name, courses.associated) %}
-### {{name[0]}}
-> {{associated[0]}}
-{% endfor %}
 
 ## Languages
 {% for language in languages.languages %}
