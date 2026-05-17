@@ -14,12 +14,12 @@ def login_to_profile(mail, password):
     # LinkedIn when logged in redirects to feed. If not logged, login elements should be available in main page
     if "feed" not in driver.title.lower():
         print("login required")
-        wait = WebDriverWait(driver, 20)
+        wait = WebDriverWait(driver, 30)
         username = wait.until(EC.presence_of_element_located((By.ID, "username")))
         username.send_keys(mail)
         password_field = wait.until(EC.presence_of_element_located((By.ID, "password")))
         password_field.send_keys(password, Keys.ENTER)
-        wait.until(lambda d: "feed" in d.title.lower())
+        WebDriverWait(driver, 60).until(lambda d: "feed" in d.title.lower())
 
     # Finds the first '/in/' href which correspond to profiles
     wait = WebDriverWait(driver, 15)
