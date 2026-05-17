@@ -10,38 +10,45 @@ to_extract = {
               "main":           {"name":        "h1",
                                  "description": "div > div.scaffold-layout.scaffold-layout--breakpoint-xl.scaffold-layout--main-aside.scaffold-layout--reflow.pv-profile.pvs-loader-wrapper__shimmer--animate > div > div > main > section > div.ph5 > div.mt2.relative > div:nth-child(1) > div.text-body-medium.break-words",
                                  "main_skills": "div > div.scaffold-layout.scaffold-layout--breakpoint-xl.scaffold-layout--main-aside.scaffold-layout--reflow.pv-profile.pvs-loader-wrapper__shimmer--animate > div > div > main > section:nth-child(4) > div:nth-child(4) > div > ul > li > div > div > div.display-flex.flex-column.align-self-center.flex-grow-1 > div > div > div:nth-child(2)"},
-              "featured":       {"title":       "div > div > div.display-flex.flex-column.full-width > a.optional-action-target-wrapper.flex-1.display-flex.full-width.relative > div > div.flex-1.display-flex.flex-column > div > div.mb1 > div.display-flex",
-                                 "description": "div > div > div.display-flex.flex-column.full-width > a.optional-action-target-wrapper.flex-1.display-flex.full-width.relative > div > div.flex-1.display-flex.flex-column > div > div.display-flex"},
+               "featured":       {"title":       ".pv-profile-component-builder__card [class*=\"inline-show-more-text\"]",
+                                  "description": ".pv-profile-component-builder__card [class*=\"inline-show-more-text\"]"},
               "experience":     {"basic" :      "div > div > div.display-flex.flex-column.align-self-center.flex-grow-1 > div.display-flex.flex-row.justify-space-between",
                                  "description": "div > div > div.display-flex.flex-column.align-self-center.flex-grow-1 > div > ul > li:nth-child(1) > div > ul > li > div"},
               "education":      {"basic" :      "div > div > div.display-flex.flex-column.align-self-center.flex-grow-1 > div.display-flex.flex-row.justify-space-between > a",
                                  "description": "div > div > div.display-flex.flex-column.align-self-center.flex-grow-1 > div.display-flex.flex-row.justify-space-between > a"},
-              "certifications": {"basic":       "div > div > div.display-flex.flex-column.align-self-center.flex-grow-1 > div.display-flex.flex-row.justify-space-between > div > div > div > div > div > span:nth-child(1)",
-                                 "dates":       "div > div > div.display-flex.flex-column.align-self-center.flex-grow-1 > div.display-flex.flex-row.justify-space-between > div > span.t-14.t-normal.t-black--light > span.pvs-entity__caption-wrapper",
-                                 "description": "div > div > div.display-flex.flex-column.align-self-center.flex-grow-1 > div.display-flex.flex-row.justify-space-between > div > span:nth-child(2) > span:nth-child(1)"},
+               "certifications": {"basic":       "section.artdeco-card.pb3 .display-flex.flex-column.full-width",
+                                  "dates":       "section.artdeco-card.pb3 span.pvs-entity__caption-wrapper",
+                                  "description": "section.artdeco-card.pb3 .pvs-entity__sub-components"},
               "projects":       {"basic" :      "div > div > div.display-flex.flex-column.align-self-center.flex-grow-1 > div.display-flex.flex-row.justify-space-between > div > div > div > div",
                                  "description": "div > div > div.display-flex.flex-column.align-self-center.flex-grow-1 > div > ul > li:nth-child(1)",
                                  "skills":      "div > div > div.display-flex.flex-column.align-self-center.flex-grow-1 > div > ul > li:nth-child(2)"},
-              "courses":        {"name":        "div > div > div.display-flex.flex-column.full-width.align-self-center > div.display-flex.flex-row.justify-space-between > div.display-flex.flex-column.full-width > div",
-                                 "associated":  "div > div > div.display-flex.flex-column.full-width.align-self-center > div.pvs-list__outer-container.pvs-entity__sub-components > ul > li > div > div > div.display-flex"},
-              "languages":      {"languages":   "div > div > div.display-flex.flex-column.full-width.align-self-center > div > div.display-flex.flex-column.full-width"}
+
+               "volunteering":   {"basic":       "#volunteering_experience ~ div ul li.artdeco-list__item div.display-flex.flex-column.align-self-center.flex-grow-1 > div.display-flex.flex-row.justify-space-between",
+                                  "description": "#volunteering_experience ~ div ul li.artdeco-list__item div.pvs-entity__sub-components"},
+               "languages":      {"languages":   "section.artdeco-card.pb3 .display-flex.flex-column.full-width"}
 }
 
 
+
+# Keys whose data lives inside another file (e.g. volunteering is in main.html)
+source_override = {"volunteering": "main"}
 
 def markdownify():
     extracted = {}
     for key in list(to_extract.keys()):
         extracted[key] = {}
-        with open(f"data/{key}.html", encoding="utf-8") as html_content:
+        source = source_override.get(key, key)
+        with open(f"data/{source}.html", encoding="utf-8") as html_content:
             selector = Selector(html_content.read())
-        html_content.close()
 
         for item in to_extract[key].items():
             if type(item[1]) == str:
                 res = selector.css(item[1]).getall()
                 for index in range(len(res)):
-                    text = bs(res[index], features="lxml").get_text().strip()
+                    soup = bs(res[index], features="lxml")
+                    for br in soup.find_all("br"):
+                        br.replace_with("\n")
+                    text = soup.get_text().strip()
                     res[index] = text.split('\n')
                     res[index] = [repeated_string(item) for item in res[index] if item.strip()]
                 extracted[key] |= {item[0]: res}
