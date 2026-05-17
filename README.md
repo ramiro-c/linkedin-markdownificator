@@ -9,6 +9,12 @@ As the name suggests, you can use this tool to export your LinkedIn profile to M
 - Add your credentials to ```.env```
 - Run ```main.py```
 
+## Testing
+
+```bash
+python3 -m pytest tests/ -v
+```
+
 ### Templates
 There are currently two templates: ```default_template.md``` and ```peppermint.md```. In order to switch between them go to ```markdownify()``` in [```processer.py```](https://github.com/rifusaki/linkedin-markdownificator/blob/main/utils/processer.py). These are some examples:
 
