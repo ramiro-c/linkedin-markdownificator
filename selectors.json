@@ -1,0 +1,35 @@
+{
+  "main": {
+    "name": "h1",
+    "description": "div > div.scaffold-layout.scaffold-layout--breakpoint-xl.scaffold-layout--main-aside.scaffold-layout--reflow.pv-profile.pvs-loader-wrapper__shimmer--animate > div > div > main > section > div.ph5 > div.mt2.relative > div:nth-child(1) > div.text-body-medium.break-words",
+    "main_skills": "div > div.scaffold-layout.scaffold-layout--breakpoint-xl.scaffold-layout--main-aside.scaffold-layout--reflow.pv-profile.pvs-loader-wrapper__shimmer--animate > div > div > main > section:nth-child(4) > div:nth-child(4) > div > ul > li > div > div > div.display-flex.flex-column.align-self-center.flex-grow-1 > div > div > div:nth-child(2)"
+  },
+  "featured": {
+    "title": ".pv-profile-component-builder__card [class*=\"inline-show-more-text\"]"
+  },
+  "experience": {
+    "basic": "div > div > div.display-flex.flex-column.align-self-center.flex-grow-1 > div.display-flex.flex-row.justify-space-between",
+    "description": "div > div > div.display-flex.flex-column.align-self-center.flex-grow-1 > div > ul > li:nth-child(1) > div > ul > li > div"
+  },
+  "education": {
+    "basic": "div > div > div.display-flex.flex-column.align-self-center.flex-grow-1 > div.display-flex.flex-row.justify-space-between > a",
+    "description": "div > div > div.display-flex.flex-column.align-self-center.flex-grow-1 > div.display-flex.flex-row.justify-space-between > a"
+  },
+  "certifications": {
+    "basic": "section.artdeco-card.pb3 .display-flex.flex-column.full-width",
+    "dates": "section.artdeco-card.pb3 span.pvs-entity__caption-wrapper",
+    "description": "section.artdeco-card.pb3 .pvs-entity__sub-components"
+  },
+  "projects": {
+    "basic": "div > div > div.display-flex.flex-column.align-self-center.flex-grow-1 > div.display-flex.flex-row.justify-space-between > div > div > div > div",
+    "description": "div > div > div.display-flex.flex-column.align-self-center.flex-grow-1 > div > ul > li:nth-child(1)",
+    "skills": "div > div > div.display-flex.flex-column.align-self-center.flex-grow-1 > div > ul > li:nth-child(2)"
+  },
+  "volunteering": {
+    "basic": "#volunteering_experience ~ div ul li.artdeco-list__item div.display-flex.flex-column.align-self-center.flex-grow-1 > div.display-flex.flex-row.justify-space-between",
+    "description": "#volunteering_experience ~ div ul li.artdeco-list__item div.pvs-entity__sub-components"
+  },
+  "languages": {
+    "languages": "section.artdeco-card.pb3 .display-flex.flex-column.full-width"
+  }
+}

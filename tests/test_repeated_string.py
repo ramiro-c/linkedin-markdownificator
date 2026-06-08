@@ -23,3 +23,19 @@ def test_odd_length():
 
 def test_whitespace_preserved():
     assert repeated_string("a b a b") == "a b a b"
+
+
+def test_single_char():
+    assert repeated_string("a") == "a"
+
+
+def test_single_char_repeated():
+    assert repeated_string("aa") == "a"
+
+
+def test_unicode():
+    assert repeated_string("ñoño") == "ño"
+
+
+def test_whitespace_only():
+    assert repeated_string("   ") == "   "
