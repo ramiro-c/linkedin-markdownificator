@@ -45,12 +45,42 @@ def markdownify():
                 res = selector.css(item[1]).getall()
                 for index in range(len(res)):
                     soup = bs(res[index], features="lxml")
+                    for hidden in soup.select('.visually-hidden'):
+                        hidden.decompose()
                     for br in soup.find_all("br"):
                         br.replace_with("\n")
                     text = soup.get_text().strip()
                     res[index] = text.split('\n')
                     res[index] = [repeated_string(item) for item in res[index] if item.strip()]
                 extracted[key] |= {item[0]: res}
+
+    # Fix experience alignment: group roles under their company, removing company-header
+    # entries and pairing each role with its description.
+    if "experience" in extracted:
+        enriched_basic = []
+        enriched_desc = []
+        current_company = None
+        current_location = None
+        desc_idx = 0
+        for item in extracted["experience"]["basic"]:
+            if len(item) == 3:
+                current_company = item[0]
+                current_location = item[2]
+            elif len(item) == 2:
+                company = current_company or item[0]
+                location = current_location or ""
+                enriched_basic.append([item[0], company, item[1], location])
+                if desc_idx < len(extracted["experience"]["description"]):
+                    enriched_desc.append(extracted["experience"]["description"][desc_idx])
+                    desc_idx += 1
+            elif len(item) == 4:
+                company = item[1].split(' · ')[0] if ' · ' in item[1] else item[1]
+                enriched_basic.append([item[0], company, item[2], item[3]])
+                if desc_idx < len(extracted["experience"]["description"]):
+                    enriched_desc.append(extracted["experience"]["description"][desc_idx])
+                    desc_idx += 1
+        extracted["experience"]["basic"] = enriched_basic
+        extracted["experience"]["description"] = enriched_desc
 
     # Save raw extracted data in a file        
     # with open("data/extracted.md", "w", encoding="utf-8") as f:

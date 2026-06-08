@@ -21,9 +21,7 @@ author_profile: true
 
 *{{basic[2]}}*
 
-{{description[0]}}
-
-{{description[1]}}
+{{ description | join('\n\n') }}
 
 {% endfor %}
 

@@ -1,6 +1,7 @@
 output.md
 
-/.env
+.env
+**/.env
 selenium/
 /__pycache__
 *.html

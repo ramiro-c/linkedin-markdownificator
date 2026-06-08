@@ -15,9 +15,8 @@
 ### {{basic[0]}} — {{basic[1]}}
 > *{{basic[2]}}*
 
-{{description[0]}}
+{{ description | join('\n\n') }}
 
-###### {{description[1]}}
 {% endfor %}
 
 ## Education
