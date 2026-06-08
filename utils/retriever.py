@@ -1,9 +1,12 @@
-from utils.lib import *
-from utils.driver import *
-
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+import os
 import time
+
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+
+from utils.driver import WebDriver
 
 
 def login_to_profile(mail, password):
@@ -11,7 +14,6 @@ def login_to_profile(mail, password):
     driver.get("https://linkedin.com/login")
     driver.implicitly_wait(15)
 
-    # LinkedIn when logged in redirects to feed. If not logged, login elements should be available in main page
     if "feed" not in driver.title.lower():
         print("login required")
         wait = WebDriverWait(driver, 30)
@@ -21,22 +23,29 @@ def login_to_profile(mail, password):
         password_field.send_keys(password, Keys.ENTER)
         WebDriverWait(driver, 60).until(lambda d: "feed" in d.title.lower())
 
-    # Finds the first '/in/' href which correspond to profiles
     wait = WebDriverWait(driver, 15)
     profile_link = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[contains(@href, '/in/')]")))
     profile_link.click()
-    WebDriverWait(driver, 10).until(
-        lambda d: d.execute_script("return document.readyState") == "complete"
-    )
+    WebDriverWait(driver, 10).until(lambda d: d.execute_script("return document.readyState") == "complete")
 
     return driver.current_url
 
 
-# The following dictionary contains the pages to be retrieved.
-retrieval = ("main", "featured", "experience", "education", "certifications", "projects", "honors", "languages")
+retrieval = (
+    "main",
+    "featured",
+    "experience",
+    "education",
+    "certifications",
+    "projects",
+    "honors",
+    "languages",
+)
 
-# Omit argument excludes pages from previous tuple
-def download_profile(profile_url, omit = []):
+
+def download_profile(profile_url, omit=None):
+    if omit is None:
+        omit = []
     driver = WebDriver.get_instance()
 
     to_retrieve = [i for i in list(retrieval) if i not in omit]
@@ -45,9 +54,7 @@ def download_profile(profile_url, omit = []):
         print(f"scraping: {element}")
         if element != "main":
             driver.get(profile_url + f"details/{element}/")
-            WebDriverWait(driver, 15).until(
-                lambda d: d.execute_script("return document.readyState") == "complete"
-            )
+            WebDriverWait(driver, 15).until(lambda d: d.execute_script("return document.readyState") == "complete")
             time.sleep(3)
             driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             time.sleep(2)

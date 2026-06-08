@@ -1,14 +1,22 @@
 import os
 import sys
-sys.path.insert(0, 'utils')
+
+sys.path.insert(0, "utils")
 
 import pytest
-
 from processer import markdownify
 
 
 def data_files_exist():
-    required = ["main", "featured", "experience", "education", "certifications", "projects", "languages"]
+    required = [
+        "main",
+        "featured",
+        "experience",
+        "education",
+        "certifications",
+        "projects",
+        "languages",
+    ]
     return all(os.path.isfile(f"data/{f}.html") for f in required)
 
 

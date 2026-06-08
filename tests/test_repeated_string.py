@@ -1,5 +1,6 @@
 import sys
-sys.path.insert(0, 'utils')
+
+sys.path.insert(0, "utils")
 
 from processer import repeated_string
 

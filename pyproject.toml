@@ -1,0 +1,24 @@
+[project]
+name = "linkedin-markdownificator"
+requires-python = ">=3.10"
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "N", "SIM"]
+ignore = [
+    "E501",  # CSS selectors are inherently long; breaking them hurts readability
+    "N802",  # start_WebDriver uses camelCase
+    "N803",  # WebDriver class
+    "N806",  # variables in lower_case
+    "N815",  # mixed-case class vars
+    "N812",  # expected_conditions as EC is standard Selenium practice
+    "N813",  # BeautifulSoup as bs is standard practice
+    "N816",  # mixed-case module vars
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"

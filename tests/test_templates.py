@@ -1,5 +1,5 @@
-from jinja2 import Environment, FileSystemLoader
 import pytest
+from jinja2 import Environment, FileSystemLoader
 
 env = Environment(loader=FileSystemLoader("templates"))
 
