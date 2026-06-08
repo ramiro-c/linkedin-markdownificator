@@ -23,6 +23,7 @@ def _enrich_experience(extracted: dict[str, Any]) -> dict[str, Any]:
     current_company: str | None = None
     current_location: str | None = None
     desc_idx = 0
+    skills_list = extracted.get("experience", {}).get("skills", [])
     for item in extracted["experience"]["basic"]:
         if len(item) == 3:
             current_company = item[0]
@@ -32,16 +33,23 @@ def _enrich_experience(extracted: dict[str, Any]) -> dict[str, Any]:
             location = current_location or ""
             enriched_basic.append([item[0], company, item[1], location])
             if desc_idx < len(extracted["experience"]["description"]):
-                enriched_desc.append(extracted["experience"]["description"][desc_idx])
+                desc = list(extracted["experience"]["description"][desc_idx])
+                if desc_idx < len(skills_list) and skills_list[desc_idx]:
+                    desc.append(skills_list[desc_idx][0])
+                enriched_desc.append(desc)
                 desc_idx += 1
         elif len(item) == 4:
             company = item[1].split(" · ")[0] if " · " in item[1] else item[1]
             enriched_basic.append([item[0], company, item[2], item[3]])
             if desc_idx < len(extracted["experience"]["description"]):
-                enriched_desc.append(extracted["experience"]["description"][desc_idx])
+                desc = list(extracted["experience"]["description"][desc_idx])
+                if desc_idx < len(skills_list) and skills_list[desc_idx]:
+                    desc.append(skills_list[desc_idx][0])
+                enriched_desc.append(desc)
                 desc_idx += 1
     extracted["experience"]["basic"] = enriched_basic
     extracted["experience"]["description"] = enriched_desc
+    extracted["experience"].pop("skills", None)
     return extracted
 
 

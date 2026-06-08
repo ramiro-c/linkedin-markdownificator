@@ -94,3 +94,21 @@ def test_company_no_location():
     assert result["experience"]["basic"] == [
         ["Dev", "Corp", "2019-2021", "Office"],
     ]
+
+
+def test_skills_merged_into_description():
+    extracted = {
+        "experience": {
+            "basic": [
+                ["Corp", "Full-time", "Remote"],
+                ["Dev", "2023-2024"],
+            ],
+            "description": [["Did stuff"]],
+            "skills": [["Aptitudes: Python · React"]],
+        },
+    }
+    result = _enrich_experience(extracted)
+    assert result["experience"]["description"] == [
+        ["Did stuff", "Aptitudes: Python · React"],
+    ]
+    assert "skills" not in result["experience"]
