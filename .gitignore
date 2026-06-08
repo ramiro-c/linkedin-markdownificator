@@ -7,7 +7,7 @@ selenium/
 *.html
 *.txt
 !requirements.txt
-data/extracted.md
+data/
 *.pyc
 testing/
 
