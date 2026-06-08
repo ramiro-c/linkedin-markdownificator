@@ -6,3 +6,5 @@ parsel
 pathlib
 jinja2
 pytest
+ruff
+ruff
