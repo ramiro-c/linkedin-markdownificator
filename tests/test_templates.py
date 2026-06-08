@@ -1,9 +1,11 @@
+from typing import Any
+
 import pytest
 from jinja2 import Environment, FileSystemLoader
 
 env = Environment(loader=FileSystemLoader("templates"))
 
-mock = {
+mock: dict[str, Any] = {
     "main": {
         "name": [["John Doe"]],
         "description": [["Software engineer"]],
@@ -41,7 +43,7 @@ mock = {
 
 
 @pytest.mark.parametrize("template_name", ["default_template.md", "peppermint.md"])
-def test_template_renders_without_error(template_name):
+def test_template_renders_without_error(template_name: str) -> None:
     template = env.get_template(template_name)
     result = template.render(mock, zip=zip, len=len)
     assert "John Doe" in result
@@ -54,7 +56,7 @@ def test_template_renders_without_error(template_name):
 
 
 @pytest.mark.parametrize("template_name", ["default_template.md", "peppermint.md"])
-def test_template_no_html_tags(template_name):
+def test_template_no_html_tags(template_name: str) -> None:
     template = env.get_template(template_name)
     result = template.render(mock, zip=zip, len=len)
     assert "<h3" not in result

@@ -1,36 +1,48 @@
 {
+  "_meta": {
+    "about": "CSS selectors for LinkedIn profile sections. LinkedIn's HTML is brittle — these may break on any DOM change. Prefer data-* attributes and semantic classes if LinkedIn adds them.",
+    "parsing": "Each selector returns a list of elements. Text is extracted, <br> replaced with newlines, .visually-hidden stripped. The processer iterates by index across keys (basic[i] -> description[i])."
+  },
   "main": {
     "name": "h1",
     "description": "div > div.scaffold-layout.scaffold-layout--breakpoint-xl.scaffold-layout--main-aside.scaffold-layout--reflow.pv-profile.pvs-loader-wrapper__shimmer--animate > div > div > main > section > div.ph5 > div.mt2.relative > div:nth-child(1) > div.text-body-medium.break-words",
     "main_skills": "div > div.scaffold-layout.scaffold-layout--breakpoint-xl.scaffold-layout--main-aside.scaffold-layout--reflow.pv-profile.pvs-loader-wrapper__shimmer--animate > div > div > main > section:nth-child(4) > div:nth-child(4) > div > ul > li > div > div > div.display-flex.flex-column.align-self-center.flex-grow-1 > div > div > div:nth-child(2)"
   },
   "featured": {
+    "_about": "Featured posts/sections on the profile. Falls back to empty list if none.",
     "title": ".pv-profile-component-builder__card [class*=\"inline-show-more-text\"]"
   },
   "experience": {
+    "_about": "Returns a mix of company headers (3 items: name, type, location) and role entries (2 items: title, dates). _enrich_experience() in processer.py groups roles under their preceding company header by item count.",
+    "_alternatives": "Could use aria-level or role attributes if LinkedIn adds them. Currently no data-* attribute distinguishes headers from items.",
     "basic": "div > div > div.display-flex.flex-column.align-self-center.flex-grow-1 > div.display-flex.flex-row.justify-space-between",
     "description": "div > div > div.display-flex.flex-column.align-self-center.flex-grow-1 > div > ul > li:nth-child(1) > div > ul > li > div",
     "skills": "div > div > div.display-flex.flex-column.align-self-center.flex-grow-1 > div > ul > li:nth-child(2)"
   },
   "education": {
+    "_about": "Both basic and description use the same selector. basic extracts [institution, degree, dates]. description should target sub-components but shares same element — may need separate selector if LinkedIn adds nested detail text.",
     "basic": "div > div > div.display-flex.flex-column.align-self-center.flex-grow-1 > div.display-flex.flex-row.justify-space-between > a",
     "description": "div > div > div.display-flex.flex-column.align-self-center.flex-grow-1 > div.display-flex.flex-row.justify-space-between > a"
   },
   "certifications": {
+    "_about": "License certifications. basic = [title, issuer, id], dates = issue/expiry date, description = optional sub-details.",
     "basic": "section.artdeco-card.pb3 .display-flex.flex-column.full-width",
     "dates": "section.artdeco-card.pb3 span.pvs-entity__caption-wrapper",
     "description": "section.artdeco-card.pb3 .pvs-entity__sub-components"
   },
   "projects": {
+    "_about": "Projects section. basic = [project_name, association], description = details, skills = associated tech stack.",
     "basic": "div > div > div.display-flex.flex-column.align-self-center.flex-grow-1 > div.display-flex.flex-row.justify-space-between > div > div > div > div",
     "description": "div > div > div.display-flex.flex-column.align-self-center.flex-grow-1 > div > ul > li:nth-child(1)",
     "skills": "div > div > div.display-flex.flex-column.align-self-center.flex-grow-1 > div > ul > li:nth-child(2)"
   },
   "volunteering": {
+    "_about": "Volunteering section. Source overridden to main.html via source_override in processer.py. basic = [org, role, dates, cause].",
     "basic": "#volunteering_experience ~ div ul li.artdeco-list__item div.display-flex.flex-column.align-self-center.flex-grow-1 > div.display-flex.flex-row.justify-space-between",
     "description": "#volunteering_experience ~ div ul li.artdeco-list__item div.pvs-entity__sub-components"
   },
   "languages": {
+    "_about": "Languages section. Returns [[language, proficiency], ...].",
     "languages": "section.artdeco-card.pb3 .display-flex.flex-column.full-width"
   }
 }

@@ -59,6 +59,8 @@ def markdownify(template_name: str = "peppermint.md", json_path: str | None = No
 
     extracted: dict[str, Any] = {}
     for key in list(to_extract.keys()):
+        if key.startswith("_"):
+            continue
         extracted[key] = {}
         source = source_override.get(key, key)
         try:

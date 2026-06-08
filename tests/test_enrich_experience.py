@@ -1,12 +1,13 @@
 import sys
+from typing import Any
 
 sys.path.insert(0, "utils")
 
 from processer import _enrich_experience
 
 
-def test_company_header_then_roles():
-    extracted = {
+def test_company_header_then_roles() -> None:
+    extracted: dict[str, Any] = {
         "experience": {
             "basic": [
                 ["Company Inc", "Full-time", "Remote"],
@@ -30,8 +31,8 @@ def test_company_header_then_roles():
     ]
 
 
-def test_standalone_roles():
-    extracted = {
+def test_standalone_roles() -> None:
+    extracted: dict[str, Any] = {
         "experience": {
             "basic": [
                 ["Full Stack Dev", "Company A · Full-time", "2024-2025", "Hybrid"],
@@ -50,8 +51,8 @@ def test_standalone_roles():
     ]
 
 
-def test_orphan_role_no_company():
-    extracted = {
+def test_orphan_role_no_company() -> None:
+    extracted: dict[str, Any] = {
         "experience": {
             "basic": [
                 ["Solo Role", "2023-2024"],
@@ -67,21 +68,21 @@ def test_orphan_role_no_company():
     ]
 
 
-def test_no_experience():
-    extracted = {"education": {"basic": [["UTN"]]}}
+def test_no_experience() -> None:
+    extracted: dict[str, Any] = {"education": {"basic": [["UTN"]]}}
     result = _enrich_experience(extracted)
     assert result == extracted
 
 
-def test_empty_experience():
-    extracted = {"experience": {"basic": [], "description": []}}
+def test_empty_experience() -> None:
+    extracted: dict[str, Any] = {"experience": {"basic": [], "description": []}}
     result = _enrich_experience(extracted)
     assert result["experience"]["basic"] == []
     assert result["experience"]["description"] == []
 
 
-def test_company_no_location():
-    extracted = {
+def test_company_no_location() -> None:
+    extracted: dict[str, Any] = {
         "experience": {
             "basic": [
                 ["Corp", "Full-time", "Office"],
@@ -96,8 +97,8 @@ def test_company_no_location():
     ]
 
 
-def test_skills_merged_into_description():
-    extracted = {
+def test_skills_merged_into_description() -> None:
+    extracted: dict[str, Any] = {
         "experience": {
             "basic": [
                 ["Corp", "Full-time", "Remote"],
