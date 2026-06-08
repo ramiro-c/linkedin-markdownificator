@@ -66,9 +66,9 @@ author_profile: true
 ## Projects
 {% for basic, description, skills in zip(projects.basic, projects.description, projects.skills) %}
 ### {{basic[0]}}
-
+{% if basic[1] %}
 *{{basic[1]}}*
-
+{% endif %}
 {{description[0]}}
 
 {{skills[0]}}
