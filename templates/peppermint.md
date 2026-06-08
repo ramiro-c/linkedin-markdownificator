@@ -9,11 +9,13 @@ author_profile: true
 *{{skills[0]}}*
 {% endfor %}
 
+{% if featured.title %}
 ## Featured
 {% for post in featured.title %}
 {{ post | join('\n') }}
 
 {% endfor %}
+{% endif %}
 
 ## Experience
 {% for basic, description in zip(experience.basic, experience.description) %}
@@ -25,6 +27,7 @@ author_profile: true
 
 {% endfor %}
 
+{% if education.basic %}
 ## Education
 {% for basic, description in zip(education.basic, education.description) %}
 ### {{basic[1]}} — {{basic[0]}}
@@ -40,7 +43,9 @@ author_profile: true
 {{description[-1]}}
 
 {% endfor %}
+{% endif %}
 
+{% if volunteering.basic %}
 ## Volunteering
 {% for basic, description in zip(volunteering.basic, volunteering.description) %}
 ### {{basic[0]}} — {{basic[1]}}
@@ -52,7 +57,9 @@ author_profile: true
 {{basic[3]}}
 
 {% endfor %}
+{% endif %}
 
+{% if certifications.basic %}
 ## Certifications
 {% for basic, description in zip(certifications.basic, certifications.description) %}
 ### {{basic[0]}}
@@ -62,7 +69,9 @@ author_profile: true
 {{description[0]}}
 
 {% endfor %}
+{% endif %}
 
+{% if projects.basic %}
 ## Projects
 {% for basic, description, skills in zip(projects.basic, projects.description, projects.skills) %}
 ### {{basic[0]}}
@@ -74,8 +83,11 @@ author_profile: true
 {{skills[0]}}
 
 {%endfor%}
+{% endif %}
 
+{% if languages.languages %}
 ## Languages
 {% for language in languages.languages %}
 - **{{language[0]}}:** {{language[1]}}
 {% endfor %}
+{% endif %}

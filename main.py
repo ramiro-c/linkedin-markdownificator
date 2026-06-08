@@ -19,7 +19,12 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    if not args.cached:
+    if args.cached:
+        html_files = [f for f in os.listdir("data") if f.endswith(".html")] if os.path.isdir("data") else []
+        if not html_files:
+            print("No cached HTML files found. Run without --cached to scrape first, or populate data/ manually.")
+            return
+    else:
         load_dotenv()
         profile_url = login_to_profile(
             os.getenv("MAIL"),

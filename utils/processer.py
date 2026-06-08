@@ -66,6 +66,9 @@ def markdownify(template_name: str = "peppermint.md", json_path: str | None = No
                 selector = Selector(html_content.read())
         except FileNotFoundError:
             print(f"Warning: data/{source}.html not found, skipping {key}")
+            for item in to_extract[key].items():
+                if isinstance(item[1], str):
+                    extracted[key][item[0]] = []
             continue
 
         for item in to_extract[key].items():
