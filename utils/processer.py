@@ -80,6 +80,10 @@ def markdownify(template_name: str = "peppermint.md", json_path: str | None = No
 
     extracted = _enrich_experience(extracted)
 
+    for entry in extracted.get("projects", {}).get("basic", []):
+        if len(entry) < 2:
+            entry.append("")
+
     if json_path:
         os.makedirs(os.path.dirname(json_path) or ".", exist_ok=True)
         with open(json_path, "w", encoding="utf-8") as f:

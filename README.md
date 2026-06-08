@@ -63,5 +63,4 @@ Pretty much because, as far as I know, I can't. In order to get access to the Me
 
 >  Please note that this product is only available for legal registered entities (e.g. LLC, Corporations, 501(c), etc.) and not individual developers.
 
-## Known issues
-- When projects are not associated with any experience or education, incorrect information is retrieved.
+
