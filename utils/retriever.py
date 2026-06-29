@@ -1,3 +1,4 @@
+import contextlib
 import functools
 import os
 import time
@@ -95,15 +96,14 @@ def download_profile(profile_url: str, omit: list[str] | None = None, headless: 
                 "for (var i = step; i <= h; i += step) { window.scrollTo(0, i); }"
             )
             # Wait for at least one entity-collection-item to have visible children,
-            # giving lazy components up to 10 s to hydrate.
-            try:
+            # giving lazy components up to 10 s to hydrate. The section may genuinely
+            # be empty (e.g. honors), so suppress the timeout and carry on.
+            with contextlib.suppress(Exception):
                 WebDriverWait(driver, 10).until(
                     lambda d: d.execute_script(
                         "return document.querySelectorAll('[componentkey*=\"entity-collection-item\"]').length > 0;"
                     )
                 )
-            except Exception:
-                pass  # section may genuinely be empty (e.g. honors); carry on
             WebDriverWait(driver, 5).until(lambda d: d.execute_script("return document.readyState") == "complete")
         else:
             driver.get(profile_url)

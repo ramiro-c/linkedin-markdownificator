@@ -101,9 +101,7 @@ def _extract_new_layout(section: str, html: str) -> dict[str, Any]:
     Returns a dict matching the structure expected by the Jinja templates.
     """
     sel = Selector(html)
-    entities_html = sel.xpath(
-        '//*[@componentkey and contains(@componentkey, "entity-collection-item")]'
-    ).getall()
+    entities_html = sel.xpath('//*[@componentkey and contains(@componentkey, "entity-collection-item")]').getall()
 
     if section == "main":
         # name: first h2 in workspace that is not the toasts title
@@ -230,18 +228,19 @@ def _extract_new_layout(section: str, html: str) -> dict[str, Any]:
     if section == "featured":
         # Featured items are identified by FeFeaturedItemUrn componentkey attributes.
         # They appear in pairs (same HTML duplicated); take every other one to deduplicate.
-        featured_item_els = sel.xpath(
-            '//*[starts-with(@componentkey, "FeFeaturedItemUrn")]'
-        ).getall()
+        featured_item_els = sel.xpath('//*[starts-with(@componentkey, "FeFeaturedItemUrn")]').getall()
         # Noise tokens to drop: reaction counts, comment counts, badges, type labels.
         _NOISE_PREFIXES = (
-            "recomendación", "recommendation", "certificación", "certificacion",
+            "recomendación",
+            "recommendation",
+            "certificación",
+            "certificacion",
         )
         _NOISE_PATTERNS = re.compile(
             r"^\d+,?\s*(número de reacciones|reactions?)"  # "10, número de reacciones10"
-            r"|comentario"                                   # "1 comentario(s)"
-            r"|·\s*\d+[a-z°]+"                              # "· 1er" connection badge
-            r"|destacado con premium"                        # premium badge
+            r"|comentario"  # "1 comentario(s)"
+            r"|·\s*\d+[a-z°]+"  # "· 1er" connection badge
+            r"|destacado con premium"  # premium badge
             r"|número de reacciones",
             re.IGNORECASE,
         )
@@ -287,6 +286,7 @@ def _extract_new_layout(section: str, html: str) -> dict[str, Any]:
                     m = re.search(r"url=([^&]+)", href)
                     if m:
                         import urllib.parse
+
                         url = urllib.parse.unquote(m.group(1))
                     break
                 if href.startswith("http") and "linkedin.com" not in href:
