@@ -48,12 +48,18 @@ def login_to_profile(mail: str, password: str, headless: bool = False) -> str:
             password_field.send_keys(password, Keys.ENTER)
             WebDriverWait(driver, 60).until(lambda d: "feed" in d.title.lower())
 
+        # Navigate to the profile by URL rather than clicking: the first
+        # //a[@href*='/in/'] match is the global-nav "Me" item, which opens a
+        # JS dropdown instead of navigating, leaving the driver on /feed/.
         wait = WebDriverWait(driver, 15)
-        profile_link = wait.until(EC.element_to_be_clickable((By.XPATH, "//a[contains(@href, '/in/')]")))
-        profile_link.click()
+        profile_link = wait.until(EC.presence_of_element_located((By.XPATH, "//a[contains(@href, '/in/')]")))
+        profile_href = profile_link.get_attribute("href")
+        driver.get(profile_href)
+        WebDriverWait(driver, 15).until(lambda d: "/in/" in d.current_url)
         WebDriverWait(driver, 10).until(lambda d: d.execute_script("return document.readyState") == "complete")
 
-        return driver.current_url
+        # Ensure a trailing slash so `profile_url + "details/<slug>/"` builds valid URLs.
+        return driver.current_url if driver.current_url.endswith("/") else driver.current_url + "/"
     except Exception as e:
         print(f"login failed: {e}")
         raise
@@ -81,11 +87,28 @@ def download_profile(profile_url: str, omit: list[str] | None = None, headless: 
         if element_slug != "main":
             driver.get(profile_url + f"details/{element_slug}/")
             WebDriverWait(driver, 15).until(lambda d: d.execute_script("return document.readyState") == "complete")
-            WebDriverWait(driver, 5).until(lambda d: d.execute_script("return document.readyState") == "complete")
-            driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+            # Gradually scroll to trigger LinkedIn's LazyColumn rendering.
+            # A single full-page scroll often misses lazy items; step-scroll is more reliable.
+            driver.execute_script(
+                "var h = document.body.scrollHeight;"
+                "var step = Math.ceil(h / 4);"
+                "for (var i = step; i <= h; i += step) { window.scrollTo(0, i); }"
+            )
+            # Wait for at least one entity-collection-item to have visible children,
+            # giving lazy components up to 10 s to hydrate.
+            try:
+                WebDriverWait(driver, 10).until(
+                    lambda d: d.execute_script(
+                        "return document.querySelectorAll('[componentkey*=\"entity-collection-item\"]').length > 0;"
+                    )
+                )
+            except Exception:
+                pass  # section may genuinely be empty (e.g. honors); carry on
             WebDriverWait(driver, 5).until(lambda d: d.execute_script("return document.readyState") == "complete")
         else:
-            WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.TAG_NAME, "h1")))
+            driver.get(profile_url)
+            WebDriverWait(driver, 15).until(lambda d: d.execute_script("return document.readyState") == "complete")
+            WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.TAG_NAME, "h2")))
 
         with open(f"data/{element_slug}.html", "w", encoding="utf-8") as f:
             f.write(driver.page_source)
