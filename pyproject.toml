@@ -19,6 +19,12 @@ ignore = [
     "N816",  # mixed-case module vars
 ]
 
+[tool.ruff.lint.isort]
+# A runtime-generated, gitignored `selenium/` dir (Chrome user-data-dir) makes
+# isort misdetect `selenium` as first-party and split it from the other
+# selenium imports. Pin it as third-party so the import block sorts as one group.
+known-third-party = ["selenium"]
+
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
