@@ -1,3 +1,6 @@
+.cachebro/
+.ruff_cache/
+.pytest_cache/
 output.md
 
 .env
