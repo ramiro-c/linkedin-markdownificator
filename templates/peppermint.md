@@ -6,7 +6,7 @@ permalink: /CV/
 author_profile: true
 ---
 {{ description[0] }}
-*{{skills[0]}}*
+{% if skills[0] %}*{{skills[0]}}*{% endif %}
 {% endfor %}
 
 {% if featured.title %}

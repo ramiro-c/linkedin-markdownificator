@@ -114,7 +114,7 @@ def _extract_new_layout(section: str, html: str) -> dict[str, Any]:
         return {
             "name": [[name_text]] if name_text else [],
             "description": [[desc_text]] if desc_text else [],
-            "main_skills": [],  # not present in new layout; zip stops here → no header rendered
+            "main_skills": [[""]],  # new layout has no main skills; provide empty so zip iterates
         }
 
     if section == "experience":

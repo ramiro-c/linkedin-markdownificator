@@ -1,7 +1,7 @@
 {% for name, description, skills in zip(main.name, main.description, main.main_skills) %}
 # {{ name[0] }} 
 {{ description[0] }}
-###### Main skills: {{skills[0]}}
+{% if skills[0] %}###### Main skills: {{skills[0]}}{% endif %}
 {% endfor %}
 
 {% if featured.title %}
