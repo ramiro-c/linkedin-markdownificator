@@ -59,8 +59,14 @@ def _enrich_experience(extracted: dict[str, Any]) -> dict[str, Any]:
 
 
 def _is_new_layout(html: str) -> bool:
-    """Detect LinkedIn's post-2025 React layout (componentkey attributes, no artdeco classes)."""
-    return 'componentkey="' in html and "artdeco" not in html
+    """Detect LinkedIn's post-2025 React layout (componentkey attributes).
+
+    When componentkey is present, the page uses the new React-based layout and we
+    should prefer the _extract_new_layout parser. The old artdeco-style selectors
+    are unreliable on pages that have both markers (LinkedIn sometimes renders
+    sections with a mix of old and new classes).
+    """
+    return 'componentkey="' in html
 
 
 def _clean_texts(el_html: str, exclude_keywords: tuple[str, ...] = ("anuncio", "publicidad")) -> list[str]:
