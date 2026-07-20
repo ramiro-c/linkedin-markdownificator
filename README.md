@@ -6,6 +6,12 @@ Export your LinkedIn profile to Markdown. From there you can export it to PDF ho
 >[!IMPORTANT]
 > Without access to the API, this was developed using a ```selenium``` webdriver and manually downloading the source HTML for each page. This means that it can easily break if LinkedIn changes its interface.
 
+## Demo
+
+<video src="assets/demo.mp4" controls width="700"></video>
+
+*(if the video doesn't render here, [download/view it directly](assets/demo.mp4))*
+
 ## Basic usage
 - Clone the repo
 - Add your credentials to ```.env```
