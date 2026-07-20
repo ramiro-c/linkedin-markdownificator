@@ -480,3 +480,7 @@ def markdownify(template_name: str = "peppermint.md", json_path: str | None = No
 
     with open("output.md", "w", encoding="utf-8") as out:
         out.write(output_text)
+
+    print(f"Results saved in {os.path.abspath('output.md')}")
+    if json_path:
+        print(f"Extracted data saved in {os.path.abspath(json_path)}")

@@ -1,6 +1,8 @@
 # ```linkedin-markdownificator```
 Export your LinkedIn profile to Markdown. From there you can export it to PDF however you like.
 
+> Started as a fork of [rifusaki/linkedin-markdownificator](https://github.com/rifusaki/linkedin-markdownificator), extended with support for LinkedIn's new React layout, About/pinned-skills extraction, JSON export, and a test suite.
+
 >[!IMPORTANT]
 > Without access to the API, this was developed using a ```selenium``` webdriver and manually downloading the source HTML for each page. This means that it can easily break if LinkedIn changes its interface.
 
@@ -46,13 +48,12 @@ python3 main.py --template default_template.md
 
 ### ```peppermint```
 Designed for Jekyll (uses [```minimal-mistakes```](https://github.com/mmistakes/minimal-mistakes)):
-- [Live](https://rifusaki.co/CV/)
-- [Markdown](https://github.com/rifusaki/linkedin-markdownificator/blob/main/examples/example-peppermint.md)
-- [PDF](https://github.com/rifusaki/linkedin-markdownificator/blob/main/examples/example-peppermint.pdf)
+- [Markdown](examples/example-peppermint.md)
+- [PDF](examples/example-peppermint.pdf)
 
 ### ```default_template```
-- [Markdown](https://github.com/rifusaki/linkedin-markdownificator/blob/main/examples/example-default.md)
-- [PDF](https://github.com/rifusaki/linkedin-markdownificator/blob/main/examples/example-default.pdf)
+- [Markdown](examples/example-default.md)
+- [PDF](examples/example-default.pdf)
 
 ## FAQ
 #### Just... why?
