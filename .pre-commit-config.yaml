@@ -5,3 +5,12 @@ repos:
       - id: ruff-check
         args: [--fix]
       - id: ruff-format
+  - repo: local
+    hooks:
+      - id: pyvibe
+        name: pyvibe
+        entry: pyvibe
+        language: system
+        args: ["."]
+        pass_filenames: false
+        types: [python]
