@@ -10,7 +10,7 @@ Export your LinkedIn profile to Markdown. From there you can export it to PDF ho
 
 ![Demo](assets/demo.gif)
 
-*(GIF for inline preview — [full quality video with audio](assets/demo.mp4))*
+*(GIF for inline preview — [full quality video](assets/demo.mp4))*
 
 ## Basic usage
 - Clone the repo
