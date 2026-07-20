@@ -124,3 +124,105 @@ def test_markdownify_handles_missing_html(temp_workspace: Path, capsys: Any) -> 
         assert output.exists()
     finally:
         os.chdir(cwd)
+
+
+_NEW_LAYOUT_ABOUT_AND_SKILLS = """
+<html><body>
+<main id="workspace">
+  <h2>John Doe</h2>
+  <p>Verified badge</p>
+  <p>Software Engineer</p>
+  <section>
+    <div id="card1" componentkey="com.linkedin.sdui.profile.card.refXYZAbout">
+      <section componentkey="com.linkedin.sdui.profile.card.refXYZAbout">
+        <div><div>
+          <div>
+            <h2>Acerca de</h2>
+            <div><a componentkey="john-doe_about_edit" href="/edit/">edit</a></div>
+          </div>
+          <div>
+            <p><span data-testid="expandable-text-box">Building things that ship.</span></p>
+            <div><div><div><div>
+              <p>Principales aptitudes</p>
+              <p>Python &bull; Go</p>
+            </div></div></div></div>
+          </div>
+        </div></div>
+      </section>
+    </div>
+  </section>
+</main>
+</body></html>
+"""
+
+
+def test_markdownify_new_layout_extracts_about_and_main_skills(temp_workspace: Path) -> None:
+    """End-to-end: post-2025 React layout should populate about.text and
+    main.main_skills in the exported JSON (regression test for the scroll +
+    extraction fix — these used to be empty/missing entirely)."""
+    selectors: dict[str, Any] = {
+        "main": {"name": "h1", "main_skills": "irrelevant-for-new-layout"},
+        "about": {"text": "irrelevant-for-new-layout"},
+    }
+    (temp_workspace / "selectors.json").write_text(json.dumps(selectors))
+
+    (temp_workspace / "data" / "main.html").write_text(_NEW_LAYOUT_ABOUT_AND_SKILLS)
+
+    (temp_workspace / "templates" / "peppermint.md").write_text(
+        "{% for name, description, skills in zip(main.name, main.description, main.main_skills) %}"
+        "{{ name[0] }}{% if skills[0] %} | {{ skills[0] }}{% endif %}"
+        "{% endfor %}"
+        "{% if about.text %}\n## About\n{{ about.text[0] }}{% endif %}"
+    )
+
+    from processer import markdownify  # noqa: PLC0415
+
+    cwd = Path.cwd()
+    try:
+        os.chdir(temp_workspace)
+        json_path = str(temp_workspace / "extracted.json")
+        markdownify(json_path=json_path)
+
+        data: dict[str, Any] = json.loads(Path(json_path).read_text())
+        assert data["about"]["text"] == ["Building things that ship."]
+        assert data["main"]["main_skills"] == [["Python • Go"]]
+
+        content = (temp_workspace / "output.md").read_text()
+        assert "## About" in content
+        assert "Building things that ship." in content
+        assert "Python • Go" in content
+    finally:
+        os.chdir(cwd)
+
+
+def test_markdownify_new_layout_without_about_or_skills(temp_workspace: Path) -> None:
+    """Graceful degradation: a new-layout profile with no About/pinned-skills card
+    should not crash, and should produce empty about.text / stub main_skills."""
+    selectors: dict[str, Any] = {
+        "main": {"name": "h1", "main_skills": "irrelevant-for-new-layout"},
+        "about": {"text": "irrelevant-for-new-layout"},
+    }
+    (temp_workspace / "selectors.json").write_text(json.dumps(selectors))
+
+    (temp_workspace / "data" / "main.html").write_text(
+        '<html><body><main id="workspace" componentkey="x">'
+        "<h1>John Doe</h1><p>badge</p><p>Software Engineer</p>"
+        "</main></body></html>"
+    )
+
+    from processer import markdownify  # noqa: PLC0415
+
+    cwd = Path.cwd()
+    try:
+        os.chdir(temp_workspace)
+        json_path = str(temp_workspace / "extracted.json")
+        markdownify(json_path=json_path)
+
+        data: dict[str, Any] = json.loads(Path(json_path).read_text())
+        assert data["about"]["text"] == []
+        assert data["main"]["main_skills"] == [[""]]
+
+        output = temp_workspace / "output.md"
+        assert output.exists()
+    finally:
+        os.chdir(cwd)

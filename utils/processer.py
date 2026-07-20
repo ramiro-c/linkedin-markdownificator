@@ -17,7 +17,7 @@ def repeated_string(s: str) -> str:
     return s[:half] if s[half:] == s[:half] else s
 
 
-source_override: dict[str, str] = {"volunteering": "main"}
+source_override: dict[str, str] = {"volunteering": "main", "about": "main"}
 
 
 def _enrich_experience(extracted: dict[str, Any]) -> dict[str, Any]:
@@ -101,6 +101,87 @@ def _normalize_skills(line: str) -> str:
     return line
 
 
+_SKILLS_LABELS = ("principales aptitudes", "top skills")
+
+
+def _join_about_paragraphs(text: str) -> str:
+    """Group <br>-separated lines back into paragraphs, deduping each line.
+
+    LinkedIn renders a double <br><br> between logical paragraphs and a
+    single <br> for in-paragraph wraps. After the caller replaces every <br>
+    with "\\n", blank lines mark paragraph boundaries: lines within a
+    paragraph are joined with a space, and paragraphs are joined with a
+    blank line so the rendered Markdown keeps real paragraph breaks.
+    """
+    paragraphs: list[str] = []
+    current: list[str] = []
+    for raw_line in text.split("\n"):
+        line = raw_line.strip()
+        if not line:
+            if current:
+                paragraphs.append(" ".join(current))
+                current = []
+            continue
+        current.append(repeated_string(line))
+    if current:
+        paragraphs.append(" ".join(current))
+    return "\n\n".join(paragraphs)
+
+
+def _extract_about_and_skills(sel: Selector) -> tuple[str, str]:
+    """Extract the About text and the pinned/top skills line from the main page.
+
+    LinkedIn's post-2025 React layout renders "About" and "Principales
+    aptitudes"/"Top skills" (pinned skills) inside the *same* SDUI card,
+    keyed by a componentkey ending in the case-sensitive substring "About"
+    (e.g. "com.linkedin.sdui.profile.card.ref<urn>About"). That casing is
+    deliberate: it excludes the lowercase "<slug>_about_edit" edit-button
+    componentkey, and the card itself lives entirely outside the page
+    <footer> — so the unrelated "Acerca de" / "About LinkedIn" footer link
+    (href="https://about.linkedin.com/") can never be picked up by this
+    xpath. A `<footer>` decompose below is kept as a defensive no-op in case
+    a future markup change nests things differently.
+
+    Within the card, both About and the skills line are plain <p> tags (no
+    h2/h3 heading and no pill/list markup for skills, despite earlier
+    assumptions) — the skills line itself is already "•"-joined, e.g.
+    "React.js • Node.js • Python".
+    """
+    card_html = sel.xpath('(//*[@componentkey and contains(@componentkey, "About")])[1]').get()
+    if not card_html:
+        return "", ""
+
+    soup = bs(card_html, features="lxml")
+    for footer in soup.find_all("footer"):
+        footer.decompose()
+    for hidden in soup.select(".visually-hidden"):
+        hidden.decompose()
+    for btn in soup.find_all("button"):
+        btn.decompose()  # "ver más" / "see more" toggle text, not real content
+    for br in soup.find_all("br"):
+        br.replace_with("\n")
+
+    about_text = ""
+    skills_line = ""
+    take_next_as_skills = False
+    for p in soup.find_all("p"):
+        raw_text = p.get_text(separator="\n").strip()
+        if not raw_text:
+            continue
+        if take_next_as_skills:
+            lines = [repeated_string(ln.strip()) for ln in raw_text.split("\n") if ln.strip()]
+            skills_line = " ".join(lines)
+            take_next_as_skills = False
+            continue
+        if raw_text.strip().lower() in _SKILLS_LABELS:
+            take_next_as_skills = True
+            continue
+        if not about_text:
+            about_text = _join_about_paragraphs(raw_text)
+
+    return about_text, skills_line
+
+
 def _extract_new_layout(section: str, html: str) -> dict[str, Any]:
     """
     Extract profile data from LinkedIn's post-2025 React layout.
@@ -117,11 +198,21 @@ def _extract_new_layout(section: str, html: str) -> dict[str, Any]:
         desc_els = sel.xpath('(//main[@id="workspace"]//p)[2]').getall()
         desc_text = re.sub(r"<[^>]+>", "", desc_els[0]).strip() if desc_els else ""
         desc_text = bs(desc_text, features="lxml").get_text().strip() if desc_text else ""
+        _, skills_line = _extract_about_and_skills(sel)
         return {
             "name": [[name_text]] if name_text else [],
             "description": [[desc_text]] if desc_text else [],
-            "main_skills": [[""]],  # new layout has no main skills; provide empty so zip iterates
+            # Pinned/top skills, comma-separated; empty stub so zip still iterates
+            # when the profile has none.
+            "main_skills": [[skills_line]] if skills_line else [[""]],
         }
+
+    if section == "about":
+        about_text, _ = _extract_about_and_skills(sel)
+        # Flat [str] shape (max one entry) — unlike name/description/main_skills
+        # there's no zip/iteration counterpart for About, so it doesn't need the
+        # nested [[str]] list-of-lists shape.
+        return {"text": [about_text] if about_text else []}
 
     if section == "experience":
         basic: list[list[str]] = []
@@ -355,7 +446,20 @@ def markdownify(template_name: str = "peppermint.md", json_path: str | None = No
                 text = soup.get_text().strip()
                 res[index] = text.split("\n")
                 res[index] = [repeated_string(item) for item in res[index] if item.strip()]
-            extracted[key] |= {item[0]: res}
+            if key == "about" and item[0] == "text":
+                # Keep the shape consistent with _extract_new_layout("about", ...),
+                # which returns a flat [str] (max one entry) for about.text — both
+                # templates render it as `{{ about.text[0] }}` expecting a string.
+                # The generic loop above otherwise builds list[list[str]] per matched
+                # element, which would leak a Python list into the rendered Markdown
+                # if this legacy path is ever exercised for "about". Flatten: join each
+                # matched element's lines into one paragraph, then join multiple
+                # matched elements as separate paragraphs.
+                paragraphs = [" ".join(lines) for lines in res if lines]
+                flattened = "\n\n".join(paragraphs)
+                extracted[key] |= {item[0]: [flattened] if flattened else []}
+            else:
+                extracted[key] |= {item[0]: res}
 
     extracted = _enrich_experience(extracted)
 

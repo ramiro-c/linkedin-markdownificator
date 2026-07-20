@@ -109,6 +109,39 @@ def download_profile(profile_url: str, omit: list[str] | None = None, headless: 
             driver.get(profile_url)
             WebDriverWait(driver, 15).until(lambda d: d.execute_script("return document.readyState") == "complete")
             WebDriverWait(driver, 15).until(EC.presence_of_element_located((By.TAG_NAME, "h2")))
+            # Gradually scroll to trigger LinkedIn's LazyColumn rendering, same as the
+            # detail sub-pages: the About/pinned-skills card below the activity section
+            # is lazy-hydrated and never renders into page_source without this.
+            driver.execute_script(
+                "var h = document.body.scrollHeight;"
+                "var step = Math.ceil(h / 4);"
+                "for (var i = step; i <= h; i += step) { window.scrollTo(0, i); }"
+            )
+            # Wait for the About/Highlights SDUI card (componentkey containing the
+            # case-sensitive substring "About") to have actual text content, not just
+            # an empty placeholder div. Measured live: querySelectorAll alone returns
+            # non-empty elements instantly even before hydration, so the check must
+            # look at innerText, not just presence. The match must stay case-sensitive
+            # here to agree with the extractor: utils/processer.py's
+            # _extract_about_and_skills() reads `contains(@componentkey, "About")`,
+            # which deliberately excludes the lowercase "<slug>_about_edit" edit-button
+            # componentkey. A case-insensitive wait would match that edit button and
+            # could resolve as soon as *it* hydrates, before the real About/skills card
+            # does — saving unhydrated HTML with no error (this whole block is wrapped
+            # in contextlib.suppress). The wait and the extraction must agree on what
+            # counts as "the real card", not just "anything with about in the name".
+            # The section may genuinely be empty (no About/pinned skills), so suppress
+            # the timeout and carry on.
+            with contextlib.suppress(Exception):
+                WebDriverWait(driver, 10).until(
+                    lambda d: d.execute_script(
+                        "var els = document.querySelectorAll('[componentkey*=\"About\"]');"
+                        "var total = 0;"
+                        "els.forEach(function(e) { total += (e.innerText || '').length; });"
+                        "return total > 0;"
+                    )
+                )
+            WebDriverWait(driver, 5).until(lambda d: d.execute_script("return document.readyState") == "complete")
 
         with open(f"data/{element_slug}.html", "w", encoding="utf-8") as f:
             f.write(driver.page_source)

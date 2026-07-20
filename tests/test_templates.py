@@ -9,7 +9,10 @@ mock: dict[str, Any] = {
     "main": {
         "name": [["John Doe"]],
         "description": [["Software engineer"]],
-        "main_skills": [["React, Python"]],
+        "main_skills": [["React.js • Node.js • Python"]],
+    },
+    "about": {
+        "text": ["Senior engineer with a focus on backend systems.\n\nBuilds things that ship."],
     },
     "featured": {
         "title": [["Post one content\n\nwith multiple lines", "Post two content"]],
@@ -53,6 +56,29 @@ def test_template_renders_without_error(template_name: str) -> None:
     assert "My Project" in result
     assert "Helper" in result
     assert "Spanish" in result
+
+
+@pytest.mark.parametrize("template_name", ["default_template.md", "peppermint.md"])
+def test_template_renders_about_section(template_name: str) -> None:
+    template = env.get_template(template_name)
+    result = template.render(mock, zip=zip, len=len)
+    assert "## About" in result
+    assert "Senior engineer with a focus on backend systems." in result
+
+
+@pytest.mark.parametrize("template_name", ["default_template.md", "peppermint.md"])
+def test_template_renders_main_skills(template_name: str) -> None:
+    template = env.get_template(template_name)
+    result = template.render(mock, zip=zip, len=len)
+    assert "React.js • Node.js • Python" in result
+
+
+@pytest.mark.parametrize("template_name", ["default_template.md", "peppermint.md"])
+def test_template_omits_about_heading_when_missing(template_name: str) -> None:
+    mock_without_about = {k: v for k, v in mock.items() if k != "about"}
+    template = env.get_template(template_name)
+    result = template.render(mock_without_about, zip=zip, len=len)
+    assert "## About" not in result
 
 
 @pytest.mark.parametrize("template_name", ["default_template.md", "peppermint.md"])

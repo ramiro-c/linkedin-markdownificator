@@ -8,6 +8,10 @@
     "description": "div > div.scaffold-layout.scaffold-layout--breakpoint-xl.scaffold-layout--main-aside.scaffold-layout--reflow.pv-profile.pvs-loader-wrapper__shimmer--animate > div > div > main > section > div.ph5 > div.mt2.relative > div:nth-child(1) > div.text-body-medium.break-words",
     "main_skills": "div > div.scaffold-layout.scaffold-layout--breakpoint-xl.scaffold-layout--main-aside.scaffold-layout--reflow.pv-profile.pvs-loader-wrapper__shimmer--animate > div > div > main > section:nth-child(4) > div:nth-child(4) > div > ul > li > div > div > div.display-flex.flex-column.align-self-center.flex-grow-1 > div > div > div:nth-child(2)"
   },
+  "about": {
+    "_about": "Acerca de / About section. Source overridden to main.html via source_override in processer.py, same as volunteering. The layout that actually runs today (post-2025 React/SDUI) is handled by _extract_new_layout('about', ...) in processer.py, which anchors on the componentkey ending in 'About' rather than this CSS selector — this entry exists mostly so markdownify() knows to call that path at all (it iterates this file's keys) and to document/fall back for the legacy layout, which has not been observed live.",
+    "text": "section.artdeco-card.pb3 .display-flex.ph5 .inline-show-more-text"
+  },
   "featured": {
     "_about": "Featured posts/sections on the profile. Falls back to empty list if none.",
     "title": ".pv-profile-component-builder__card [class*=\"inline-show-more-text\"]"

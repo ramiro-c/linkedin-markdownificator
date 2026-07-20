@@ -4,6 +4,11 @@
 {% if skills[0] %}###### Main skills: {{skills[0]}}{% endif %}
 {% endfor %}
 
+{% if about is defined and about.text %}
+## About
+{{ about.text[0] }}
+{% endif %}
+
 {% if featured.title %}
 ## Featured
 {% for post in featured.title %}
